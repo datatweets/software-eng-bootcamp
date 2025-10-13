@@ -1,4 +1,4 @@
-# Complete Development Environment Setup Guide
+# Complete Development Environment Setup Guide (Windows)
 
 **Purpose:** Prepare your Windows 10/11 machine for the Software Engineering Fundamentals Bootcamp.
 

@@ -445,294 +445,514 @@ class SimpleConfig:
 
 The simple version does exactly what's required—nothing more, nothing less. It's easy to understand, test, and use. If you later need configuration history or validation, you can add it when the requirement is real, not hypothetical [5].
 
-The SOLID principles provide additional guidance for object-oriented design. While a full exploration exceeds our scope, the key insight is that these principles work together to create maintainable, flexible code. The Single Responsibility Principle ensures each class has one reason to change. The Open/Closed Principle encourages extension without modification. These principles complement the core concepts we've covered, providing a comprehensive framework for software engineering decisions.
+## SOLID Principles: Building Maintainable Object-Oriented Systems
 
-## Practical Example: Building a Modular Order Processing System
+The SOLID principles represent five fundamental guidelines for object-oriented design that work synergistically to create maintainable, flexible, and robust software systems. Introduced and popularized by Robert C. Martin, these principles aren't arbitrary rules but distilled wisdom from decades of software engineering experience. When applied consistently, they complement the core concepts of modularity, abstraction, encapsulation, and reusability, creating a comprehensive framework for professional software development.
 
-Let's apply the software engineering principles we've covered to build a realistic order processing system. This example demonstrates modularity, abstraction, encapsulation, and reusability working together in a production-like scenario.
+### The Five SOLID Principles
+
+SOLID is an acronym where each letter represents a distinct principle:
+
+- **S**ingle Responsibility Principle (SRP)
+- **O**pen/Closed Principle (OCP)
+- **L**iskov Substitution Principle (LSP)
+- **I**nterface Segregation Principle (ISP)
+- **D**ependency Inversion Principle (DIP)
+
+These principles address different aspects of software design but share a common goal: reducing coupling, increasing cohesion, and making code easier to understand, test, and modify. Let's explore each principle with practical examples that demonstrate both violations and correct implementations.
+
+### Single Responsibility Principle (SRP)
+
+**Definition:** A class should have one, and only one, reason to change. Each class should have a single, well-defined responsibility within the system.
+
+The Single Responsibility Principle is perhaps the most intuitive yet frequently violated SOLID principle. It states that a class should focus on doing one thing well rather than handling multiple unrelated concerns. When a class has multiple responsibilities, changes to one responsibility can affect or break the others, creating fragile code that's difficult to maintain.
+
+Consider what "reason to change" means in practice. If business rules change, database schema evolves, and reporting formats are updated, how many classes need modification? Ideally, each change should affect only one class. When a class handles user authentication, database persistence, and email notifications, any change to any of these concerns requires touching the same class—a clear SRP violation.
+
+Here's an example showing the problem:
+
+```python
+# Violates SRP - multiple responsibilities in one class
+class User:
+    def __init__(self, username, email):
+        self.username = username
+        self.email = email
+    
+    def save_to_database(self):
+        """Database persistence - first responsibility"""
+        # SQL logic to save user
+        pass
+    
+    def send_welcome_email(self):
+        """Email notification - second responsibility"""
+        # Email sending logic
+        pass
+    
+    def generate_report(self):
+        """Report generation - third responsibility"""
+        # Report formatting logic
+        pass
+```
+
+This `User` class has at least three reasons to change: database schema changes, email service changes, or report format changes. Each modification risks breaking unrelated functionality.
+
+The SRP solution separates these concerns:
+
+```python
+# Follows SRP - each class has one responsibility
+class User:
+    """Represents user data - single responsibility: user entity"""
+    def __init__(self, username, email):
+        self.username = username
+        self.email = email
+
+class UserRepository:
+    """Handles user persistence - single responsibility: database operations"""
+    def save(self, user):
+        # Database logic isolated here
+        pass
+
+class EmailService:
+    """Manages email notifications - single responsibility: email delivery"""
+    def send_welcome_email(self, user):
+        # Email logic isolated here
+        pass
+
+class UserReportGenerator:
+    """Generates user reports - single responsibility: report formatting"""
+    def generate_report(self, user):
+        # Report logic isolated here
+        pass
+```
+
+Now each class has exactly one reason to change. Database migrations only affect `UserRepository`. Email service changes only touch `EmailService`. Report format updates only modify `UserReportGenerator`. The `User` class remains stable, changing only when the user entity concept itself evolves.
+
+This separation creates several benefits beyond maintainability. Testing becomes straightforward—you can test database operations independently of email sending. Teams can work on different responsibilities simultaneously without conflicts. Reusability improves since `EmailService` can send emails for any entity, not just users.
+
+### Open/Closed Principle (OCP)
+
+**Definition:** Software entities (classes, modules, functions) should be open for extension but closed for modification. You should be able to add new functionality without changing existing code.
+
+The Open/Closed Principle addresses a fundamental challenge in software development: how do you add features to existing code without breaking what already works? The answer lies in designing systems that allow new behavior through extension rather than modification. This principle works hand-in-hand with abstraction—by depending on abstract interfaces rather than concrete implementations, you can introduce new functionality without touching existing code.
+
+Consider a payment processing system that starts with credit card support:
+
+```python
+# Violates OCP - must modify class to add payment methods
+class PaymentProcessor:
+    def process_payment(self, amount, payment_type):
+        if payment_type == 'credit_card':
+            # Credit card logic
+            print(f"Processing ${amount} via credit card")
+        elif payment_type == 'paypal':
+            # PayPal logic - added later, modified existing code
+            print(f"Processing ${amount} via PayPal")
+        # Adding bitcoin requires modifying this method again
+```
+
+Every new payment method requires modifying `process_payment()`, adding another conditional branch. This violates OCP because the class isn't closed for modification. As payment methods proliferate, the conditional logic becomes unwieldy and error-prone. Worse, modifying working code risks introducing bugs into previously stable payment processing.
+
+The OCP solution uses abstraction and polymorphism:
 
 ```python
 from abc import ABC, abstractmethod
-from datetime import datetime
-from typing import List, Dict, Optional
 
-# Abstraction - Define interfaces for pluggable components
-class InventoryService(ABC):
-    """Abstract interface for inventory management"""
-    
+# Abstract base class - defines the contract
+class PaymentMethod(ABC):
     @abstractmethod
-    def check_availability(self, product_id: str, quantity: int) -> bool:
-        """Check if product quantity is available"""
-        pass
-    
-    @abstractmethod
-    def reserve_items(self, product_id: str, quantity: int) -> str:
-        """Reserve items and return reservation ID"""
+    def process(self, amount):
         pass
 
-class NotificationService(ABC):
-    """Abstract interface for notifications"""
-    
-    @abstractmethod
-    def send_notification(self, recipient: str, message: str) -> bool:
-        """Send notification to recipient"""
-        pass
+# Concrete implementations - extend behavior without modifying existing code
+class CreditCardPayment(PaymentMethod):
+    def process(self, amount):
+        print(f"Processing ${amount} via credit card")
 
-# Encapsulation - Order entity with protected state
-class Order:
-    """Encapsulates order data and enforces business rules"""
-    
-    # Class-level constant - reusable across all orders
-    VALID_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
-    
-    def __init__(self, order_id: str, customer_email: str):
-        self._order_id = order_id
-        self._customer_email = customer_email
-        self._items = []
-        self._status = 'pending'
-        self._total = 0.0
-        self._created_at = datetime.now()
-        self._status_history = [{'status': 'pending', 'timestamp': self._created_at}]
-    
-    @property
-    def order_id(self) -> str:
-        """Read-only access to order ID"""
-        return self._order_id
-    
-    @property
-    def status(self) -> str:
-        """Read-only access to current status"""
-        return self._status
-    
-    @property
-    def total(self) -> float:
-        """Read-only access to order total"""
-        return self._total
-    
-    def add_item(self, product_id: str, quantity: int, price: float):
-        """Add item with validation - maintains order consistency"""
-        if quantity <= 0:
-            raise ValueError("Quantity must be positive")
-        if price < 0:
-            raise ValueError("Price cannot be negative")
-        
-        self._items.append({
-            'product_id': product_id,
-            'quantity': quantity,
-            'price': price
-        })
-        self._total += price * quantity
-    
-    def update_status(self, new_status: str):
-        """Update status with validation and history tracking"""
-        if new_status not in self.VALID_STATUSES:
-            raise ValueError(f"Invalid status: {new_status}")
-        
-        self._status = new_status
-        self._status_history.append({
-            'status': new_status,
-            'timestamp': datetime.now()
-        })
-    
-    def get_items(self) -> List[Dict]:
-        """Return copy of items to prevent external modification"""
-        return list(self._items)
+class PayPalPayment(PaymentMethod):
+    def process(self, amount):
+        print(f"Processing ${amount} via PayPal")
 
-# Modularity - Separate validation concerns
-class OrderValidator:
-    """Reusable validation logic following DRY principle"""
-    
-    @staticmethod
-    def validate_email(email: str) -> bool:
-        """Validate email format - single source of truth"""
-        return email and '@' in email and '.' in email.split('@')[1]
-    
-    @staticmethod
-    def validate_order_items(items: List[Dict]) -> bool:
-        """Validate order has valid items"""
-        if not items:
-            return False
-        return all(
-            item.get('quantity', 0) > 0 and item.get('price', 0) >= 0
-            for item in items
-        )
-    
-    @staticmethod
-    def validate_minimum_order(total: float, minimum: float = 10.0) -> bool:
-        """Validate order meets minimum value"""
-        return total >= minimum
+class BitcoinPayment(PaymentMethod):
+    """New payment method - no modifications to existing classes"""
+    def process(self, amount):
+        print(f"Processing ${amount} via Bitcoin")
 
-# Modularity - Separate pricing logic
-class PricingCalculator:
-    """Handles all pricing calculations - single responsibility"""
-    
-    def __init__(self):
-        # Configuration could come from database or config file
-        self._tax_rate = 0.08
-        self._shipping_rates = {
-            'standard': 5.99,
-            'express': 12.99,
-            'overnight': 24.99
-        }
-    
-    def calculate_tax(self, subtotal: float) -> float:
-        """Calculate tax based on subtotal"""
-        return subtotal * self._tax_rate
-    
-    def calculate_shipping(self, shipping_method: str) -> float:
-        """Get shipping cost for method"""
-        return self._shipping_rates.get(shipping_method, self._shipping_rates['standard'])
-    
-    def calculate_total(self, subtotal: float, shipping_method: str) -> Dict[str, float]:
-        """Calculate complete order total with breakdown"""
-        tax = self.calculate_tax(subtotal)
-        shipping = self.calculate_shipping(shipping_method)
-        
-        return {
-            'subtotal': subtotal,
-            'tax': tax,
-            'shipping': shipping,
-            'total': subtotal + tax + shipping
-        }
-
-# Orchestration - Brings modules together following KISS principle
-class OrderProcessor:
-    """Coordinates order processing using injected dependencies"""
-    
-    def __init__(
-        self,
-        inventory: InventoryService,
-        notifications: NotificationService,
-        validator: OrderValidator,
-        pricing: PricingCalculator
-    ):
-        # Dependency injection - flexible and testable
-        self.inventory = inventory
-        self.notifications = notifications
-        self.validator = validator
-        self.pricing = pricing
-    
-    def process_order(
-        self,
-        order: Order,
-        shipping_method: str = 'standard'
-    ) -> Dict[str, any]:
-        """Process order through complete workflow"""
-        
-        # Step 1: Validate order
-        if not self.validator.validate_email(order._customer_email):
-            return {'success': False, 'error': 'Invalid email address'}
-        
-        items = order.get_items()
-        if not self.validator.validate_order_items(items):
-            return {'success': False, 'error': 'Invalid order items'}
-        
-        if not self.validator.validate_minimum_order(order.total):
-            return {'success': False, 'error': 'Order below minimum value'}
-        
-        # Step 2: Check inventory availability
-        for item in items:
-            if not self.inventory.check_availability(
-                item['product_id'],
-                item['quantity']
-            ):
-                return {
-                    'success': False,
-                    'error': f"Product {item['product_id']} not available"
-                }
-        
-        # Step 3: Calculate final pricing
-        pricing_details = self.pricing.calculate_total(
-            order.total,
-            shipping_method
-        )
-        
-        # Step 4: Reserve inventory
-        reservations = []
-        try:
-            for item in items:
-                reservation_id = self.inventory.reserve_items(
-                    item['product_id'],
-                    item['quantity']
-                )
-                reservations.append(reservation_id)
-            
-            # Step 5: Update order status
-            order.update_status('confirmed')
-            
-            # Step 6: Send confirmation notification
-            message = f"Order {order.order_id} confirmed. Total: ${pricing_details['total']:.2f}"
-            self.notifications.send_notification(
-                order._customer_email,
-                message
-            )
-            
-            return {
-                'success': True,
-                'order_id': order.order_id,
-                'pricing': pricing_details,
-                'reservations': reservations
-            }
-            
-        except Exception as e:
-            # Rollback reservations on failure
-            order.update_status('cancelled')
-            return {'success': False, 'error': str(e)}
-
-# Concrete implementations for demonstration
-class SimpleInventoryService(InventoryService):
-    """Simple in-memory inventory implementation"""
-    
-    def __init__(self):
-        self._inventory = {'PROD-001': 100, 'PROD-002': 50}
-    
-    def check_availability(self, product_id: str, quantity: int) -> bool:
-        return self._inventory.get(product_id, 0) >= quantity
-    
-    def reserve_items(self, product_id: str, quantity: int) -> str:
-        if self.check_availability(product_id, quantity):
-            self._inventory[product_id] -= quantity
-            return f"RES-{product_id}-{datetime.now().timestamp()}"
-        raise ValueError(f"Insufficient inventory for {product_id}")
-
-class EmailNotificationService(NotificationService):
-    """Email notification implementation"""
-    
-    def send_notification(self, recipient: str, message: str) -> bool:
-        # In production, this would use an email service
-        print(f"Email to {recipient}: {message}")
-        return True
-
-# Usage example demonstrating all principles
-def main():
-    # Create order with encapsulated state
-    order = Order("ORD-12345", "customer@example.com")
-    order.add_item("PROD-001", 2, 29.99)
-    order.add_item("PROD-002", 1, 49.99)
-    
-    # Assemble processor with dependencies (modularity + abstraction)
-    processor = OrderProcessor(
-        inventory=SimpleInventoryService(),
-        notifications=EmailNotificationService(),
-        validator=OrderValidator(),
-        pricing=PricingCalculator()
-    )
-    
-    # Process order using systematic approach
-    result = processor.process_order(order, shipping_method='express')
-    
-    if result['success']:
-        print(f"Order processed successfully!")
-        print(f"Order ID: {result['order_id']}")
-        print(f"Total: ${result['pricing']['total']:.2f}")
-    else:
-        print(f"Order failed: {result['error']}")
-
-if __name__ == "__main__":
-    main()
+# Payment processor - closed for modification, open for extension
+class PaymentProcessor:
+    def process_payment(self, amount, payment_method: PaymentMethod):
+        """Works with any PaymentMethod implementation"""
+        payment_method.process(amount)
 ```
 
-This example demonstrates how software engineering principles create maintainable, testable code. Each module has a single responsibility and can be tested independently. The abstraction layers allow swapping implementations (e.g., replacing `SimpleInventoryService` with a database-backed version) without changing `OrderProcessor`. Encapsulation ensures order state remains consistent throughout the workflow. The design follows KISS by keeping each component focused and avoiding unnecessary complexity [4][5].
+Now adding Bitcoin payment requires creating a new `BitcoinPayment` class without touching `PaymentProcessor` or existing payment implementations. The processor is closed for modification (its code never changes) but open for extension (new payment methods just implement the interface).
+
+This design provides powerful benefits. Existing payment methods continue working exactly as before—no regression risk. Testing new payment methods doesn't require retesting old ones. Different developers can implement new payment methods without coordination. The system grows by addition rather than modification, a hallmark of maintainable architecture.
+
+### Liskov Substitution Principle (LSP)
+
+**Definition:** Objects of a superclass should be replaceable with objects of its subclasses without breaking the application. Derived classes must be substitutable for their base classes.
+
+The Liskov Substitution Principle, named after computer scientist Barbara Liskov, addresses a subtle but critical aspect of inheritance: behavioral compatibility. It's not enough for a subclass to simply inherit from a base class—the subclass must honor the behavioral contract of the base class. When LSP is violated, code that works with the base class breaks when given a subclass, destroying the reliability of polymorphism.
+
+Think of it this way: if you have a function that accepts a `Bird` object and calls its `fly()` method, should it work with every `Bird` subclass? The answer reveals whether your inheritance hierarchy respects LSP.
+
+Here's a classic violation:
+
+```python
+# Appears correct but violates LSP
+class Bird:
+    def fly(self):
+        print("Flying through the air")
+
+class Sparrow(Bird):
+    def fly(self):
+        print("Sparrow flying")  # Behaves as expected
+
+class Penguin(Bird):
+    def fly(self):
+        raise Exception("Penguins can't fly!")  # Violates LSP
+
+# Function expects any Bird to fly
+def make_bird_fly(bird: Bird):
+    bird.fly()  # Should work with any Bird subclass
+
+# Works fine with Sparrow
+make_bird_fly(Sparrow())
+
+# Breaks with Penguin - LSP violation
+make_bird_fly(Penguin())  # Raises exception!
+```
+
+The problem: `make_bird_fly()` works correctly with `Sparrow` but fails with `Penguin`, even though both inherit from `Bird`. This violates LSP because `Penguin` can't be substituted for `Bird` without breaking the program. The inheritance hierarchy is conceptually flawed—not all birds can fly.
+
+The LSP-compliant solution recognizes this distinction:
+
+```python
+# Respects LSP - inheritance reflects actual capabilities
+class Bird:
+    def eat(self):
+        print("Eating food")
+
+class FlyingBird(Bird):
+    """Only birds that can fly inherit this"""
+    def fly(self):
+        print("Flying through the air")
+
+class Sparrow(FlyingBird):
+    def fly(self):
+        print("Sparrow flying")
+
+class Penguin(Bird):
+    """Penguin is a Bird but not a FlyingBird"""
+    def swim(self):
+        print("Swimming in water")
+
+# Function now requires FlyingBird specifically
+def make_bird_fly(bird: FlyingBird):
+    bird.fly()  # Guaranteed to work
+
+# Works with any FlyingBird
+make_bird_fly(Sparrow())  # Success
+
+# Won't compile - Penguin isn't a FlyingBird
+# make_bird_fly(Penguin())  # Type error caught early
+```
+
+Now the type system prevents LSP violations. `Penguin` is a `Bird` but not a `FlyingBird`, accurately reflecting reality. Functions requiring flight capability accept only `FlyingBird` subclasses, ensuring substitutability. This design makes invalid states unrepresentable—the compiler prevents you from passing penguins to flying functions.
+
+LSP violations often signal that inheritance is being used incorrectly. When a subclass must override a method to throw an exception or return null, question whether inheritance is appropriate. Favor composition over inheritance when behavioral compatibility can't be guaranteed. LSP ensures that polymorphism actually works as intended—any subclass can replace its parent without surprises.
+
+### Interface Segregation Principle (ISP)
+
+**Definition:** Clients should not be forced to depend on interfaces they do not use. Many specific interfaces are better than one general-purpose interface.
+
+The Interface Segregation Principle tackles interface bloat—the tendency to create large interfaces that force implementing classes to support functionality they don't need. When interfaces become too broad, implementing classes must provide stub implementations for irrelevant methods, and clients receive access to methods they shouldn't use. ISP advocates for smaller, focused interfaces that match specific client needs.
+
+Consider a document management system with a large interface:
+
+```python
+# Violates ISP - interface too broad
+class Document(ABC):
+    @abstractmethod
+    def open(self):
+        pass
+    
+    @abstractmethod
+    def save(self):
+        pass
+    
+    @abstractmethod
+    def print(self):
+        pass
+    
+    @abstractmethod
+    def fax(self):
+        pass
+    
+    @abstractmethod
+    def scan(self):
+        pass
+
+# Implementation forced to support everything, even if irrelevant
+class ReadOnlyDocument(Document):
+    def open(self):
+        print("Opening document")
+    
+    def save(self):
+        raise Exception("Read-only document can't be saved")
+    
+    def print(self):
+        print("Printing document")
+    
+    def fax(self):
+        raise Exception("Can't fax")  # Doesn't support faxing
+    
+    def scan(self):
+        raise Exception("Can't scan")  # Doesn't support scanning
+```
+
+`ReadOnlyDocument` must implement five methods but only meaningfully supports two (`open` and `print`). The other three throw exceptions, violating the behavioral contract and confusing clients. This interface forces implementations to support operations they can't perform.
+
+The ISP solution segregates interfaces by capability:
+
+```python
+# Follows ISP - segregated interfaces
+class Openable(ABC):
+    @abstractmethod
+    def open(self):
+        pass
+
+class Saveable(ABC):
+    @abstractmethod
+    def save(self):
+        pass
+
+class Printable(ABC):
+    @abstractmethod
+    def print(self):
+        pass
+
+class Faxable(ABC):
+    @abstractmethod
+    def fax(self):
+        pass
+
+# Implementations only implement relevant interfaces
+class ReadOnlyDocument(Openable, Printable):
+    """Only implements what it actually supports"""
+    def open(self):
+        print("Opening document")
+    
+    def print(self):
+        print("Printing document")
+
+class EditableDocument(Openable, Saveable, Printable):
+    """Supports opening, saving, and printing"""
+    def open(self):
+        print("Opening editable document")
+    
+    def save(self):
+        print("Saving changes")
+    
+    def print(self):
+        print("Printing document")
+
+class MultiFunctionDocument(Openable, Saveable, Printable, Faxable):
+    """Full-featured document with all capabilities"""
+    def open(self):
+        print("Opening document")
+    
+    def save(self):
+        print("Saving document")
+    
+    def print(self):
+        print("Printing document")
+    
+    def fax(self):
+        print("Faxing document")
+```
+
+Now each class implements only the interfaces that match its actual capabilities. `ReadOnlyDocument` never encounters methods it can't support. Clients depending on `Printable` don't receive irrelevant `save()` or `fax()` methods. The type system ensures clients only access operations the implementation actually supports.
+
+ISP creates more granular abstractions that better match real-world requirements. Instead of one `Document` interface with everything, you have focused interfaces for specific capabilities. This segregation improves maintainability—adding a new operation (like `Encrypt`) doesn't affect existing classes unless they choose to implement it. Testing becomes easier since you can test each capability independently.
+
+The principle also applies to function parameters. Instead of passing an object with ten methods when you only need two, accept an interface with just those two methods. This reduces coupling and makes dependencies explicit—the function signature tells you exactly what capabilities it requires.
+
+### Dependency Inversion Principle (DIP)
+
+**Definition:** High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.
+
+The Dependency Inversion Principle fundamentally changes how we think about dependencies in software systems. Traditional architectures have high-level business logic depending directly on low-level implementation details (databases, file systems, external services). DIP inverts this relationship—high-level code depends on abstractions, and low-level implementations satisfy those abstractions. This inversion creates flexible, testable systems where implementations can change without affecting business logic.
+
+Consider an order service that needs to persist orders:
+
+```python
+# Violates DIP - high-level code depends on low-level details
+class MySQLDatabase:
+    """Low-level implementation detail"""
+    def save_to_mysql(self, data):
+        print(f"Saving to MySQL: {data}")
+
+class OrderService:
+    """High-level business logic"""
+    def __init__(self):
+        # Direct dependency on concrete implementation
+        self.database = MySQLDatabase()
+    
+    def create_order(self, order_data):
+        # Business logic coupled to MySQL specifics
+        self.database.save_to_mysql(order_data)
+        return "Order created"
+```
+
+`OrderService` directly instantiates and depends on `MySQLDatabase`. Switching to PostgreSQL requires modifying `OrderService`. Testing `OrderService` requires an actual MySQL database—you can't easily substitute a test double. The high-level business logic (order creation) is tightly coupled to low-level details (MySQL specifics).
+
+DIP inverts these dependencies:
+
+```python
+from abc import ABC, abstractmethod
+
+# Abstraction - defines what we need, not how it's implemented
+class OrderRepository(ABC):
+    """High-level abstraction for order persistence"""
+    @abstractmethod
+    def save(self, order_data):
+        pass
+
+# Low-level implementations depend on the abstraction
+class MySQLOrderRepository(OrderRepository):
+    """MySQL implementation of the abstraction"""
+    def save(self, order_data):
+        print(f"Saving to MySQL: {order_data}")
+
+class PostgreSQLOrderRepository(OrderRepository):
+    """PostgreSQL implementation - same abstraction"""
+    def save(self, order_data):
+        print(f"Saving to PostgreSQL: {order_data}")
+
+class InMemoryOrderRepository(OrderRepository):
+    """Test implementation - same abstraction"""
+    def save(self, order_data):
+        print(f"Saving to memory: {order_data}")
+
+# High-level code depends on abstraction, not implementation
+class OrderService:
+    """Business logic remains unchanged regardless of storage"""
+    def __init__(self, repository: OrderRepository):
+        # Depends on abstraction through dependency injection
+        self.repository = repository
+    
+    def create_order(self, order_data):
+        # Business logic independent of storage details
+        self.repository.save(order_data)
+        return "Order created"
+
+# Flexibility - swap implementations without changing business logic
+production_service = OrderService(MySQLOrderRepository())
+test_service = OrderService(InMemoryOrderRepository())
+```
+
+Now `OrderService` depends on the `OrderRepository` abstraction, not concrete database implementations. The implementations depend on the abstraction by implementing its interface—the dependency has been inverted. You can switch databases by passing a different repository implementation without touching business logic. Testing uses `InMemoryOrderRepository` without requiring database infrastructure.
+
+This principle creates architectures where business logic sits at the center, depending on abstractions. Infrastructure details (databases, APIs, file systems) implement those abstractions and plug into the business logic. Changes to infrastructure don't propagate to business rules. The system becomes modular, testable, and flexible.
+
+DIP works synergistically with the other SOLID principles. It complements OCP (systems open for extension), enables LSP (implementations substitute for abstractions), and uses ISP (depend on focused abstractions). Together, these principles create systems that withstand change—the hallmark of professional software engineering.
+
+### How SOLID Principles Work Together
+
+The true power of SOLID emerges when these principles work together synergistically. They aren't isolated rules but a comprehensive framework where each principle reinforces the others:
+
+- **SRP creates focused classes** that naturally satisfy LSP—classes with single responsibilities have consistent, predictable behavior that subclasses can maintain.
+- **OCP depends on abstraction** taught by DIP—you extend systems by creating new implementations of abstract interfaces without modifying existing code.
+- **ISP prevents LSP violations**—segregated interfaces ensure implementations only promise what they can deliver, maintaining behavioral compatibility.
+- **DIP enables OCP**—depending on abstractions allows adding new implementations (extension) without changing high-level code (modification).
+
+Consider a complete example showing SOLID principles working together:
+
+```python
+from abc import ABC, abstractmethod
+
+# DIP + ISP: Focused abstractions that high-level code depends on
+class NotificationSender(ABC):
+    @abstractmethod
+    def send(self, recipient, message):
+        pass
+
+class UserRepository(ABC):
+    @abstractmethod
+    def find_by_id(self, user_id):
+        pass
+
+# OCP + LSP: Implementations extend without modifying existing code
+class EmailNotificationSender(NotificationSender):
+    def send(self, recipient, message):
+        print(f"Email to {recipient}: {message}")
+
+class SMSNotificationSender(NotificationSender):
+    def send(self, recipient, message):
+        print(f"SMS to {recipient}: {message}")
+
+# SRP: Single responsibility - user notification logic only
+class UserNotificationService:
+    def __init__(self, notification_sender: NotificationSender, 
+                 user_repo: UserRepository):
+        self.sender = notification_sender  # DIP: depends on abstraction
+        self.user_repo = user_repo  # DIP: depends on abstraction
+    
+    def notify_user(self, user_id, message):
+        user = self.user_repo.find_by_id(user_id)
+        self.sender.send(user.email, message)  # Works with any sender
+
+# OCP: Add new notification method without changing existing code
+class PushNotificationSender(NotificationSender):
+    def send(self, recipient, message):
+        print(f"Push notification to {recipient}: {message}")
+
+# System extensible, testable, maintainable
+service = UserNotificationService(
+    EmailNotificationSender(),
+    user_repo_implementation
+)
+```
+
+This design exemplifies all five principles working in concert. Each class has a single responsibility (SRP). The system extends by adding new `NotificationSender` implementations without modifying `UserNotificationService` (OCP). Any `NotificationSender` can substitute for another (LSP). Interfaces are focused and specific (ISP). High-level business logic depends on abstractions, not concrete implementations (DIP).
+
+### Common SOLID Pitfalls
+
+**Over-abstraction and Analysis Paralysis**
+
+A common mistake when learning SOLID is creating abstractions for everything, even simple cases that don't warrant them. Not every class needs an interface. Not every responsibility needs separation. SOLID principles guide design decisions but shouldn't paralyze development with excessive layering.
+
+For a simple utility function that formats dates, creating an abstract `DateFormatter` interface with multiple implementations is overkill. Apply SOLID principles when complexity justifies them—when you anticipate multiple implementations, when testing requires isolation, or when change is likely. For stable, simple code, straightforward implementation without elaborate abstractions is perfectly appropriate.
+
+**Misunderstanding "Reason to Change"**
+
+SRP's "one reason to change" often confuses developers. Does a class with five methods have five reasons to change? Not necessarily. If those five methods all support a single responsibility—like parsing CSV files—they represent one reason to change (CSV format changes). The key is identifying cohesive responsibilities, not counting methods.
+
+Conversely, a class with two methods might violate SRP if those methods serve unrelated purposes. A `User` class with `save_to_database()` and `send_email()` has two distinct responsibilities despite having just two methods. Focus on conceptual responsibilities, not method count.
+
+**Interface Explosion**
+
+Aggressive application of ISP can create dozens of tiny interfaces, making the codebase harder to navigate. Balance granularity with practicality. An interface with three highly related methods that clients always use together is fine—you don't need to split it into three single-method interfaces. ISP primarily warns against large interfaces where clients only need a small subset of methods.
+
+### Practical Application Guidelines
+
+**When to Apply SOLID Principles**
+
+Apply SOLID principles in production code where maintainability matters—APIs, core business logic, shared libraries, and systems with multiple developers. These contexts benefit from clear separation of concerns, testability, and flexibility.
+
+Skip SOLID overhead in prototypes, scripts, or throwaway code. A one-time data migration script doesn't need abstract interfaces and dependency injection. Quick experiments benefit from simplicity over architectural rigor.
+
+**Refactoring Toward SOLID**
+
+You don't need perfect SOLID compliance from day one. Start with working code, then refactor as complexity grows. When a class accumulates responsibilities, split it (SRP). When adding features requires modifying existing code, introduce abstractions (OCP). When testing becomes difficult due to dependencies, invert them (DIP).
+
+Refactoring incrementally toward SOLID principles is more practical than designing perfect abstractions upfront. Let real requirements guide abstraction decisions rather than hypothetical future needs.
+
+**Testing as a SOLID Indicator**
+
+Difficulty testing code often reveals SOLID violations. If you can't test a class without a database, you're violating DIP. If testing requires complex setup due to multiple responsibilities, you're violating SRP. If tests break when adding new features, you're violating OCP. Let testing pain guide your refactoring efforts.
+
 
 ## Common Pitfalls and Best Practices
 
@@ -795,6 +1015,22 @@ Both approaches apply engineering principles but differ in how they structure th
 - **Reusability and DRY eliminate duplication**: Creating reusable components saves development time and reduces bugs. Every piece of knowledge should have a single, authoritative representation in your system [5].
 
 - **KISS and YAGNI prevent over-engineering**: Simple solutions are easier to understand and maintain. Build what you need now, not what you might need someday. Add complexity only when requirements justify it [5].
+  
+- **SOLID principles work synergistically** to create maintainable object-oriented systems. Each principle addresses different aspects of design but they reinforce each other to produce flexible, testable code.
+  
+- **Single Responsibility Principle ensures each class has one reason to change**, creating focused components that are easier to understand, test, and modify independently.
+  
+- **Open/Closed Principle enables extending systems without modifying existing code** by depending on abstractions and using polymorphism to add new behavior.
+  
+- **Liskov Substitution Principle guarantees that subclasses can replace their parent classes** without breaking functionality, making inheritance hierarchies reliable and polymorphism actually work as intended.
+  
+- **Interface Segregation Principle prevents interface bloat** by creating focused interfaces that match specific client needs, ensuring implementations only depend on methods they actually use.
+  
+- **Dependency Inversion Principle decouples high-level business logic from low-level implementation details** by having both depend on abstractions, creating flexible systems where infrastructure can change without affecting business rules.
+  
+- **SOLID complements core engineering concepts** of modularity, abstraction, encapsulation, and reusability, providing specific guidance for object-oriented design decisions.
+  
+- **Apply SOLID pragmatically**—these principles guide design but shouldn't create unnecessary complexity. Use them when the problem justifies the abstraction, not dogmatically in all code.
 
 - **Engineering principles work together**: Modularity, abstraction, encapsulation, and reusability complement each other. Apply them consistently to create professional-quality software that stands the test of time.
 

@@ -37,6 +37,9 @@ The systematic nature of software engineering means following established proces
 
 Modularity is the practice of breaking software into smaller, independent components that can be developed, tested, and maintained separately [4]. This principle is fundamental to managing complexity in modern software systems. Each module should have a single, well-defined responsibility and minimal dependencies on other modules.
 
+<img width="562" height="162" alt="image" src="https://github.com/user-attachments/assets/4de9946e-0862-4e10-a3ae-41029829e63f" />
+
+
 Consider this example of modular design in Python:
 
 ```python
@@ -194,6 +197,9 @@ Abstraction also protects against changes. If Stripe changes their API, you only
 ### Core Principle: Encapsulation and Data Protection
 
 Encapsulation bundles data and the methods that operate on that data into a single unit, while restricting direct access to internal state [4]. This principle prevents external code from making invalid modifications and maintains object consistency. Proper encapsulation creates clear boundaries and enforces invariants.
+
+<img width="650" height="556" alt="image" src="https://github.com/user-attachments/assets/9ee2939e-5f34-4b54-83b4-bf0e3c263789" />
+
 
 Here's an example showing encapsulation in practice:
 

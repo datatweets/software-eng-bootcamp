@@ -1,4 +1,4 @@
-# Introduction to Software Engineering and Definition and Key Concepts
+# Introduction to Software Engineering: Definition and Key Concepts
 
 
 ## Learning Objectives

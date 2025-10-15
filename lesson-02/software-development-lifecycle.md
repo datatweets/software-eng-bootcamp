@@ -165,15 +165,15 @@ Testing is a critical phase where the software is rigorously tested to identify 
 
 ```
            ┌───────────────┐
-          /  Manual E2E    \  ← Few, expensive
-         /    Testing       \    (~5% of tests)
-        /───────────────────\
-       /  Integration Tests  \  ← More tests
-      /    (API, Services)    \   (~15% of tests)
-     /─────────────────────────\
-    /      Unit Tests           \  ← Most tests
-   /   (Functions, Methods)      \   (~80% of tests)
-  /───────────────────────────────\
+          /    Manual E2E   \  ← Few, expensive
+         /      Testing      \    (~5% of tests)
+        /─────────────────────\
+       /   Integration Tests   \  ← More tests
+      /    (API, Services)      \   (~15% of tests)
+     /───────────────────────────\
+    /         Unit Tests          \  ← Most tests
+   /     (Functions, Methods)      \   (~80% of tests)
+  /─────────────────────────────────\
 ```
 
 **Testing Types:**
@@ -226,21 +226,21 @@ The maintenance phase involves ongoing support and updates to the software to en
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                  MAINTENANCE TYPES                   │
+│                  MAINTENANCE TYPES                  │
 ├─────────────────────────────────────────────────────┤
-│                                                      │
+│                                                     │
 │  1. CORRECTIVE: Fix bugs and defects                │
 │     Example: Patch payment processing error         │
-│                                                      │
+│                                                     │
 │  2. ADAPTIVE: Adjust to environment changes         │
 │     Example: Update API for new OS version          │
-│                                                      │
+│                                                     │
 │  3. PERFECTIVE: Enhance features and performance    │
 │     Example: Optimize database queries              │
-│                                                      │
+│                                                     │
 │  4. PREVENTIVE: Refactor to prevent future issues   │
 │     Example: Update dependencies to avoid CVEs      │
-│                                                      │
+│                                                     │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -338,7 +338,7 @@ Scalability:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    BILL PAYMENT ARCHITECTURE                 │
+│                    BILL PAYMENT ARCHITECTURE                │
 └─────────────────────────────────────────────────────────────┘
 
 ┌──────────────┐
@@ -363,10 +363,10 @@ Scalability:
                     ┌──────────────────┼────────────────┐
                     │                  │                │
                     ▼                  ▼                ▼
-            ┌───────────────┐  ┌──────────┐  ┌─────────────────┐
-            │  Payment      │  │ Database │  │  Notification   │
-            │  Gateway      │  │ (PostgreSQL)│  │  Service        │
-            │  Adapter      │  └──────────┘  └─────────────────┘
+            ┌───────────────┐  ┌─────────────┐  ┌─────────────────┐
+            │  Payment      │  │ Database    │  │  Notification   │
+            │  Gateway      │  │ (PostgreSQL)│  │    Service      │
+            │  Adapter      │  └─────────────┘  └─────────────────┘
             └───────┬───────┘
                     │
                     ▼
@@ -491,34 +491,34 @@ Sprint 4 (Weeks 7-8): Integration & Polish
 
 ```
 ┌───────────────────────────────────────────────────────────┐
-│                    TESTING STRATEGY                        │
+│                    TESTING STRATEGY                       │
 ├───────────────────────────────────────────────────────────┤
-│                                                            │
+│                                                           │
 │  UNIT TESTS (3,500 tests)                                 │
-│    - Individual function validation                        │
-│    - Mock external dependencies                            │
-│    - Run on every commit                                   │
-│                                                            │
+│    - Individual function validation                       │
+│    - Mock external dependencies                           │
+│    - Run on every commit                                  │
+│                                                           │
 │  INTEGRATION TESTS (250 tests)                            │
-│    - API endpoint testing                                  │
-│    - Database interaction validation                       │
-│    - Service-to-service communication                      │
-│                                                            │
+│    - API endpoint testing                                 │
+│    - Database interaction validation                      │
+│    - Service-to-service communication                     │
+│                                                           │
 │  E2E TESTS (50 scenarios)                                 │
-│    - Complete user flows                                   │
-│    - Mobile app automation (Detox)                         │
+│    - Complete user flows                                  │
+│    - Mobile app automation (Detox)                        │
 │    - Cross-platform testing (iOS + Android)               │
-│                                                            │
-│  PERFORMANCE TESTS                                         │
+│                                                           │
+│  PERFORMANCE TESTS                                        │
 │    - Load testing: 10,000 concurrent users                │
-│    - Stress testing: Find breaking point                   │
+│    - Stress testing: Find breaking point                  │
 │    - Soak testing: 24-hour stability test                 │
-│                                                            │
-│  SECURITY TESTS                                            │
-│    - Penetration testing                                   │
-│    - Vulnerability scanning                                │
+│                                                           │
+│  SECURITY TESTS                                           │
+│    - Penetration testing                                  │
+│    - Vulnerability scanning                               │
 │    - Compliance audit (PCI DSS)                           │
-│                                                            │
+│                                                           │
 └───────────────────────────────────────────────────────────┘
 ```
 
@@ -562,15 +562,15 @@ Week 12: Full Production Release (100%)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│           BILL PAYMENT - PRODUCTION METRICS              │
+│           BILL PAYMENT - PRODUCTION METRICS             │
 ├─────────────────────────────────────────────────────────┤
 │  Transaction Success Rate:      98.7% ✓                 │
 │  Average Processing Time:     2.1 sec ✓                 │
 │  System Uptime:               99.95% ✓                  │
 │  API Error Rate:               0.3% ✓                   │
-│  Active Users Today:          12,450                     │
-│  Total Transactions Today:    8,234                      │
-│  Average Transaction Value:   $127.50                    │
+│  Active Users Today:          12,450                    │
+│  Total Transactions Today:    8,234                     │
+│  Average Transaction Value:   $127.50                   │
 └─────────────────────────────────────────────────────────┘
 ```
 

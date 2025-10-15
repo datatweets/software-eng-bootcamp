@@ -669,13 +669,11 @@ Build feedback loops into your process. After deployment, gather user feedback a
 **Feedback Loop Integration:**
 
 ```
-          ┌──────────────────────────────────────┐
-          │         Forward Flow                 │
-          ▼                                      │
-    Requirements → Design → Code → Test → Deploy
-          ▲                                      │
-          │         Feedback Flow                │
-          └──────────────────────────────────────┘
+Requirements → Design → Code → Test → Deploy
+      ▲                                  │
+      │         Feedback Flow            │
+      └──────────────────────────────────┘
+
 
 Examples:
   - User feedback → Update requirements for next sprint
@@ -696,33 +694,33 @@ Define clear exit criteria for each phase. These criteria should be specific, me
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│              PHASE EXIT CRITERIA                        │
+│              PHASE EXIT CRITERIA                       │
 ├────────────────────────────────────────────────────────┤
-│                                                         │
-│ Requirements Phase:                                     │
+│                                                        │
+│ Requirements Phase:                                    │
 │   ✓ All user stories have acceptance criteria          │
 │   ✓ Product owner sign-off completed                   │
 │   ✓ Technical feasibility confirmed                    │
 │   ✓ No critical questions unanswered                   │
-│                                                         │
-│ Design Phase:                                           │
+│                                                        │
+│ Design Phase:                                          │
 │   ✓ Architecture review passed                         │
 │   ✓ Security review passed                             │
 │   ✓ Database schema reviewed and approved              │
 │   ✓ API contracts defined and documented               │
-│                                                         │
-│ Implementation Phase:                                   │
+│                                                        │
+│ Implementation Phase:                                  │
 │   ✓ Code coverage >= 80%                               │
 │   ✓ All code reviews approved                          │
 │   ✓ No critical or high-severity bugs                  │
 │   ✓ Static analysis passed                             │
-│                                                         │
-│ Testing Phase:                                          │
+│                                                        │
+│ Testing Phase:                                         │
 │   ✓ All test cases executed                            │
 │   ✓ No P0 or P1 bugs open                              │
 │   ✓ Performance benchmarks met                         │
 │   ✓ Security scan passed                               │
-│                                                         │
+│                                                        │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -765,10 +763,10 @@ Requirements → Design → Implementation → Testing → Deployment
 ┌─────────────────────────────────────────────┐
 │  Sprint 1  →  Sprint 2  →  Sprint 3  → ...  │
 │   (2 weeks)   (2 weeks)   (2 weeks)         │
-│                                              │
-│  Each Sprint:                                │
+│                                             │
+│  Each Sprint:                               │
 │  Plan → Design → Code → Test → Review       │
-│                                              │
+│                                             │
 │  Deliver working software every sprint      │
 └─────────────────────────────────────────────┘
 ```

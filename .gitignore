@@ -1,0 +1,2 @@
+# Ignore all slides markdown files in any folder
+**/*slides*.md

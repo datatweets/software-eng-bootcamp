@@ -1,6 +1,5 @@
 # Writing Code That Lasts: Best Practices for Readable and Maintainable Software
 
-**Audience:** Intermediate developers | **Duration:** 30 min
 
 ## Learning Objectives
 

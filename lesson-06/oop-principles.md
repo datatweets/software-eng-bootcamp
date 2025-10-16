@@ -1,6 +1,5 @@
 # Object-Oriented Programming Principles: Building Better Software
 
-**Audience:** Beginners | **Duration:** 15 min
 
 ## Learning Objectives
 

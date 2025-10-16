@@ -1,6 +1,5 @@
 # Software Design Patterns: Your Toolkit for Better Code
 
-**Audience:** Intermediate developers | **Duration:** 30 min
 
 ## Learning Objectives
 

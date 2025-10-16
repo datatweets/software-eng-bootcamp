@@ -1,6 +1,5 @@
 # Software Design and Architecture: Building Scalable and Maintainable Systems
 
-
 ## Learning Objectives
 
 By the end of this lesson, you will be able to:

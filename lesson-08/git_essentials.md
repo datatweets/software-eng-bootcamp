@@ -535,6 +535,31 @@ What do you do?
 
 **Answer**: Git is the version control system (the software tool that tracks changes). GitHub is a hosting platform that provides Git servers plus additional collaboration features like pull requests, issue tracking, and project management tools. You can use Git without GitHub.
 
+## Hands-On Practice
+
+Ready to apply what you've learned? Work through these exercises using a real Git repository:
+
+**Practice Repository**: https://github.com/datatweets/git-collaboration-practice
+
+This repository contains a simple Python task manager application with structured exercises that cover all the concepts from this lesson:
+
+- **Exercise 1**: Fork, clone, and make your first contribution (add your name to CONTRIBUTORS.md)
+- **Exercise 2**: Create a feature branch and add a priority system to tasks
+- **Exercise 3**: Find and fix an intentional bug (practice debugging and committing fixes)
+- **Exercise 4**: Create and resolve merge conflicts (the core skill for team collaboration)
+- **Exercise 5**: Review classmates' pull requests (learn code review best practices)
+
+Each exercise builds on the previous one, progressively teaching you the complete Git workflow. The repository includes detailed step-by-step instructions in the README.md and EXERCISES.md files.
+
+**Getting Started**:
+1. Visit the repository URL above
+2. Click the "Fork" button to create your own copy
+3. Clone your fork to your local machine
+4. Follow the instructions in the README.md
+5. Start with Exercise 1 and progress through all five exercises
+
+By completing these exercises, you'll gain practical experience with all the Git operations covered in this lesson: cloning, branching, committing, merging, pushing, pulling, and resolving conflicts.
+
 ## References
 
 [1] Red Hat Developer (2023). "A beginner's guide to Git version control"  

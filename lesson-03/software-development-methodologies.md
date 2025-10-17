@@ -101,7 +101,7 @@ Agile Development Cycle (Sprint-Based):
 └─────────────────────────────────────────────────────────────┘
 
     ┌──────────────────────────────────────────┐
-    │  Product Backlog (Prioritized Features) │
+    │  Product Backlog (Prioritized Features)  │
     └──────────────────────────────────────────┘
                     ↓
     ┌──────────────────────────────────────────┐

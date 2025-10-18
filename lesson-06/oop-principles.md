@@ -53,11 +53,83 @@ print(your_dog.age)   # Output: 5
 
 The `Dog` class defines what all dogs have (name, age) and can do (bark). We then create two separate dog objects with different data. According to DesignGurus.io, "Classes are custom data types created by users. They provide a blueprint for organizing attributes and methods. Objects are created using this blueprint as a base"[2]. This is the foundation of OOP: organizing code around reusable blueprints.
 
+The class is the blueprint (defines attributes & methods). Objects are concrete instances created from that blueprint, each with its own data.
+
+```
+                 .-------------------------------.
+                 |        CLASS (Blueprint)      |
+                 |  ┌─────────────────────────┐  |
+                 |  | Name: Dog               |  |
+                 |  | Attributes: name, age   |  |
+                 |  | Methods: bark()         |  |
+                 |  └─────────────────────────┘  |
+                 '-------------------------------'
+                                ||
+             (use this blueprint to create instances)
+                                \/
+                      Instance view (objects)
+                         .---------------.
+                        /  Instance:      \
+                       |  my_dog = Dog()   |
+                       |  name: "Buddy"    |
+                       |  age: 3           |
+                       |  bark() -> "Woof!"|
+                       '-------------------'
+
+OR (class -> objects mapping)
+
+                +----------------------+               +------------------+
+                | CLASS: Dog           |    creates    | OBJECT: my_dog   |
+                | - name               |  ---------->  | - name: "Buddy"  |
+                | - age                |               | - age: 3         |
+                | + bark()             |               | + bark()         |
+                +----------------------+               +------------------+
+                                                       
+                                                        +------------------+
+                                                        | OBJECT: your_dog |
+                                                        | - name: "Max"    |
+                                                        | - age: 5         |
+                                                        | + bark()         |
+                                                        +------------------+
+
+```
+
 ### Encapsulation: Protecting Your Data
 
 **Encapsulation** means bundling data and methods together while hiding internal details from outside code. According to MDN, "An object provides a public interface to other code that wants to use it but maintains its own private, internal state; other parts of the system don't have to care about what is going on inside the object"[3].
 
 Think of a TV remote. You press buttons (public interface) without knowing the complex electronics inside (private implementation). Encapsulation works the same way in code.
+```
+              .=========================================.
+              |         ENCAPSULATION (Protecting)      |
+              |  .------------------------------------. |
+              |  | class BankAccount:                 | |
+              |  |  - __balance (private)             | |
+              |  |  + deposit(amount)                 | |
+              |  |  + get_balance()                   | |
+              |  '------------------------------------' |
+              '========================================='
+                                ||  Public Interface
+                                \/
+                  +-------------------------------+
+                  |  Public methods (buttons)     |
+                  |  - deposit(500)               |
+                  |  - get_balance()              |
+                  +-------------------------------+
+                                ||
+               (external code can call these, but...)
+                                \/
+                 .-----------------------------------.
+                 |  PRIVATE STATE (hidden inside)    |
+                 |  .-----------------------------.  |
+                 |  | __balance = 1500            |  |
+                 |  | (can't be accessed directly)|  |
+                 |  '-----------------------------'  |
+                 '-----------------------------------'
+
+```
+
+Now, let’s take a look at the bank account example:
 
 ```python
 class BankAccount:

@@ -1,6 +1,5 @@
 # Implementing SDLC in Real-World Projects: A Practical Guide
 
-**Audience:** Intermediate engineers | **Duration:** 30 min
 
 ## Learning Objectives
 

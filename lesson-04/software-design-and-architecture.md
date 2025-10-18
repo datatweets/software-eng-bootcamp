@@ -274,22 +274,38 @@ Layered Architecture Flow:
 ```
 
 ```python
-# Presentation Layer
+""""
+Presentation Layer : 
+Purpose: Handle requests from users (or browsers, or APIs).
+What it does:
+Reads the request (e.g., category filter).
+Asks the service layer (product_service) to get products.
+Converts the result into a response (jsonify) to send back.
+Think of it as a waiter taking your order and bringing your food — it doesn’t cook, it just communicates.
+"""
 class ProductController:
     def __init__(self, product_service):
         self.product_service = product_service
-    
+
     def get_products(self):
         category = request.args.get('category')
         products = self.product_service.find_products(category=category)
         return jsonify({'products': [self._format(p) for p in products]})
 
-# Business Logic Layer
+"""
+Business Logic Layer:
+Purpose: Handle the logic or “brain” of the app.
+What it does:
+Gets all products from the database (through the repository).
+Filters them by category (if the user asked for one).
+Applies a business rule — show only products that are in stock.
+Think of it as the chef deciding what goes into your meal.
+"""
 class ProductService:
     def __init__(self, product_repo, inventory_repo):
         self.product_repo = product_repo
         self.inventory_repo = inventory_repo
-    
+
     def find_products(self, category=None):
         products = self.product_repo.find_all()
         if category:
@@ -297,12 +313,20 @@ class ProductService:
         # Business rule: Only return in-stock products
         return [p for p in products if self.inventory_repo.is_in_stock(p.id)]
 
-# Data Access Layer
+"""
+Data Access Layer:
+Purpose: Communicate with the database.
+What it does:
+Runs an SQL query to get data from the database.
+Converts database rows into Product objects.
+Think of it as the kitchen that actually stores and prepares the ingredients.
+"""
 class ProductRepository:
     def find_all(self):
         query = "SELECT id, name, price FROM products"
         cursor = self.db.execute(query)
         return [self._row_to_product(row) for row in cursor.fetchall()]
+
 ```
 
 **Benefits:**

@@ -194,6 +194,31 @@ print(dog.speak())  # Output: Buddy says Woof!
 
 Both `Cat` and `Dog` inherit the `name` attribute from `Animal` but customize the `speak()` method. This eliminates duplicate code and creates logical hierarchies, making your codebase more maintainable.
 
+The base class (**Animal**) provides common data and behavior; subclasses (**Cat**, **Dog**) inherit that shared functionality and override `speak()` to provide specific behavior.
+
+```
+                       .-----------------------------.
+                       |          ANIMAL (Base)      |
+                       |  + name                     |
+                       |  + __init__(name)           |
+                       |  + speak() -> "Some sound"  |
+                       '-------------+---------------'
+                                     |
+                inherits (is-a)      |        inherits (is-a)
+                                     |
+              .----------------------+----------------------.
+              |                                             |
+   .------------------------.                   .------------------------.
+   |  CAT (Subclass)        |                   |  DOG (Subclass)        |
+   |  - inherits: name      |                   |  - inherits: name      |
+   |  - speak() -> "Meow!"  |                   |  - speak() -> "Woof!"  |
+   '------------------------'                   '------------------------'
+               |                                            |
+   cat = Cat("Whiskers")                           dog = Dog("Buddy")
+   cat.speak() -> "Whiskers says Meow!"           dog.speak() -> "Buddy says Woof!"
+
+```
+
 ### Polymorphism: One Interface, Many Forms
 
 **Polymorphism** means "many forms." It allows different objects to respond to the same method call in their own way. Real Python identifies polymorphism as one of "the four key concepts of OOP in Python"[1], enabling flexible and extensible code design.
@@ -210,6 +235,29 @@ make_animal_speak(dog)  # Output: Buddy says Woof!
 ```
 
 The function `make_animal_speak()` doesn't need to know whether it's dealing with a cat or dog. It just calls `speak()`, and each object responds appropriately. This flexibility makes code more extensible and maintainable—you can add new animal types without modifying existing functions.
+
+One function (the single interface) calls `speak()`; each object implements `speak()` in its own way, so the same call yields different behavior.
+
+```
+
+                       .--------------------------------------.
+                       |  make_animal_speak(animal)           |
+                       |  -> calls animal.speak()             |
+                       '----------------+---------------------'
+                                        |
+                (works with any object that implements speak())
+                                        |
+          +-----------------------------+-----------------------------+
+          |                                                           |
+  .---------------.                                           .---------------.
+  |  CAT instance |                                           |  DOG instance |
+  |  name:Whiskers|                                           |  name:Buddy   |
+  |  speak() ->   |                                           |  speak() ->   |
+  |  "Whiskers    |                                           |  "Buddy says  |
+  |   says Meow!" |                                           |   Woof!"      |
+  '---------------'                                           '---------------'
+
+```
 
 ### Abstraction: Simplifying Complexity
 
@@ -267,6 +315,28 @@ print(f"Circle area: {circle.area():.2f}")   # Output: Circle area: 50.27
 ```
 
 The `Shape` class defines the abstract interface—every shape must have `area()` and `perimeter()` methods—but doesn't specify how to calculate them. Each concrete shape class implements these methods according to its own geometry. This ensures consistency while allowing flexibility.
+
+Abstraction defines the interface (area, perimeter) so callers can use shapes uniformly without needing to know each shape's internal calculations — like driving a car using the wheel and pedals without inspecting the engine.
+
+```
+                      .------------------------------------.
+                      |  SHAPE (Abstract Base Class)       |
+                      |  - abstract area()                 |
+                      |  - abstract perimeter()            |
+                      '----------------+-------------------'
+                                       |
+                    (defines the "what" — not the "how")
+                                       |
+                       +---------------+---------------+
+                       |                               |
+         .----------------------------.     .----------------------------.
+         | RECTANGLE (concrete)       |     | CIRCLE (concrete)          |
+         | - width, height            |     | - radius                   |
+         | + area() -> width*height   |     | + area() -> pi * r^2       |
+         | + perimeter() -> 2*(w+h)   |     | + perimeter() -> 2*pi*r    |
+         '----------------------------'     '----------------------------'
+
+```
 
 ## Practical Example
 

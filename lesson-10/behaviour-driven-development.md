@@ -97,9 +97,9 @@ Scenario Outline: Applying discount codes
 
   Examples:
     | original_price | code      | final_price |
-    | 100.00        | SAVE20    | 80.00       |
-    | 100.00        | SAVE50    | 50.00       |
-    | 100.00        | INVALID   | 100.00      |
+    | 100.00         | SAVE20    | 80.00       |
+    | 100.00         | SAVE50    | 50.00       |
+    | 100.00         | INVALID   | 100.00      |
 ```
 
 This approach keeps scenarios DRY (Don't Repeat Yourself) while testing multiple cases. Each row in the Examples table becomes a separate test execution.

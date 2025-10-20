@@ -249,7 +249,7 @@ Each environment becomes progressively more like production, catching environmen
 
 ## Practical Example: Understanding a CI/CD Pipeline
 
-Let's examine a real CI/CD pipeline for a simple Python web application using GitHub Actions. This example is based on the practical tutorial from freeCodeCamp [2]. Understanding this example will prepare you for building your own pipeline in the hands-on tutorial later.
+Let's examine a real CI/CD pipeline for a simple Python web application using GitHub Actions. Understanding this example will prepare you for building your own pipeline in the hands-on tutorial later.
 
 ### The Application: A Simple Flask API
 
@@ -452,11 +452,17 @@ Each step is a command or action. If any step fails, the job fails.
 This pipeline embodies CI/CD best practices:
 
 ✅ **Automatic:** Runs without human intervention
+
 ✅ **Fast:** Completes in under 2 minutes
+
 ✅ **Comprehensive:** Tests everything before deployment
+
 ✅ **Safe:** Deploys only after tests pass
+
 ✅ **Transparent:** Clear feedback on success/failure
+
 ✅ **Auditable:** History of all pipeline runs preserved
+
 
 ### What Makes It Beginner-Friendly
 

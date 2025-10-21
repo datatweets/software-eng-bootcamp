@@ -1,7 +1,11 @@
 # Ignore all slides markdown files in any folder
 **/*slides*.md
 .DS_Store
+
+# Quiz files
 comprehensive-quiz-with-answers.md 
 comprehensive-quiz-without-answers.md 
 QUIZ-DOCUMENTATION.md 
 QUIZ-VERIFICATION-REPORT.md
+SEQuiz.pdf
+SEQuiz- Google Forms.pdf
